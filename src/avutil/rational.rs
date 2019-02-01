@@ -1,4 +1,4 @@
-use AVRational;
+use crate::AVRational;
 use libc::{c_double, c_int, int64_t};
 
 #[inline(always)]

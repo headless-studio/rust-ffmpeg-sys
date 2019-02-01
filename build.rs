@@ -103,7 +103,7 @@ fn search() -> PathBuf {
 }
 
 fn fetch() -> io::Result<()> {
-    let status = try!(
+    let status = r#try!(
         Command::new("git")
             .current_dir(&output())
             .arg("clone")
@@ -267,7 +267,7 @@ fn build() -> io::Result<()> {
     }
 
     // run make
-    if !try!(
+    if !r#try!(
         Command::new("make")
             .arg("-j")
             .arg(num_cpus::get().to_string())
@@ -279,7 +279,7 @@ fn build() -> io::Result<()> {
     }
 
     // run make install
-    if !try!(
+    if !r#try!(
         Command::new("make")
             .current_dir(&source())
             .arg("install")

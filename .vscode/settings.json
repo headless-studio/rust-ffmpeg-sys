@@ -1,7 +1,7 @@
 {
     "rust-client.channel": "nightly",
     "rust.rustflags": "-Ctarget-feature=+crt-static",
-    "rust.clippy_preference": "on",
+    "rust.clippy_preference": "opt-in",
     "rust-client.revealOutputChannelOn": "error",
     "rust.racer_completion": true,
     "spellright.language": [
