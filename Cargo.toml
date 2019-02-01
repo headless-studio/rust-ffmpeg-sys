@@ -4,7 +4,7 @@ version = "4.0.2"
 build   = "build.rs"
 links   = "ffmpeg"
 
-authors = ["meh. <meh@schizofreni.co>"]
+authors = ["meh. <meh@schizofreni.co>", "Daniel Santana <daniel.santana@headless.studio>"]
 license = "WTFPL"
 
 description = "FFI bindings to FFmpeg"
@@ -15,11 +15,11 @@ keywords    = ["audio", "video"]
 libc = "0.2"
 
 [build-dependencies]
-num_cpus = "1.0"
+num_cpus = "1.9"
 cc = "1.0"
 pkg-config = "0.3"
-bindgen    = "0.32"
-regex      = "0.2"
+bindgen    = "0.47"
+regex      = "1.1"
 vcpkg = "0.2"
 
 [features]
