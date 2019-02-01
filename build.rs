@@ -520,36 +520,40 @@ fn main() {
     }
     // Fallback to pkg-config
     else {
-        pkg_config::Config::new()
-            .statik(statik)
-            .probe("libavutil")
-            .unwrap()
-            .include_paths;
+        if cfg!(target_os = "windows") {
+            vcpkg::Config::new().emit_includes(true).find_package("ffmpeg").unwrap().include_paths
+        } else {
+            pkg_config::Config::new()
+                .statik(statik)
+                .probe("libavutil")
+                .unwrap()
+                .include_paths;
 
-        let libs = vec![
-            ("libavformat", "AVFORMAT"),
-            ("libavfilter", "AVFILTER"),
-            ("libavdevice", "AVDEVICE"),
-            ("libavresample", "AVRESAMPLE"),
-            ("libswscale", "SWSCALE"),
-            ("libswresample", "SWRESAMPLE"),
-        ];
+            let libs = vec![
+                ("libavformat", "AVFORMAT"),
+                ("libavfilter", "AVFILTER"),
+                ("libavdevice", "AVDEVICE"),
+                ("libavresample", "AVRESAMPLE"),
+                ("libswscale", "SWSCALE"),
+                ("libswresample", "SWRESAMPLE"),
+            ];
 
-        for (lib_name, env_variable_name) in libs.iter() {
-            if env::var(format!("CARGO_FEATURE_{}", env_variable_name)).is_ok() {
-                pkg_config::Config::new()
-                    .statik(statik)
-                    .probe(lib_name)
-                    .unwrap()
-                    .include_paths;
-            }
-        };
+            for (lib_name, env_variable_name) in libs.iter() {
+                if env::var(format!("CARGO_FEATURE_{}", env_variable_name)).is_ok() {
+                    pkg_config::Config::new()
+                        .statik(statik)
+                        .probe(lib_name)
+                        .unwrap()
+                        .include_paths;
+                }
+            };
 
-        pkg_config::Config::new()
-            .statik(statik)
-            .probe("libavcodec")
-            .unwrap()
-            .include_paths
+            pkg_config::Config::new()
+                .statik(statik)
+                .probe("libavcodec")
+                .unwrap()
+                .include_paths
+        }
     };
 
     if statik && cfg!(target_os = "macos") {
