@@ -6,6 +6,7 @@ extern crate regex;
 
 use std::env;
 use std::fs::{self, create_dir, symlink_metadata, File};
+use std::collections::HashSet;
 use std::io::{self, BufRead, BufReader, Write};
 use std::path::PathBuf;
 use std::process::Command;
@@ -13,6 +14,7 @@ use std::str;
 
 use regex::Regex;
 use bindgen::callbacks::{IntKind, ParseCallbacks};
+
 
 #[derive(Debug)]
 struct Library {
@@ -43,7 +45,7 @@ static LIBRARIES: &[Library] = &[
 ];
 
 #[derive(Debug)]
-struct IntCallbacks;
+struct IntCallbacks(HashSet<String>);
 
 impl ParseCallbacks for IntCallbacks {
     fn int_macro(&self, _name: &str, value: i64) -> Option<IntKind> {
@@ -69,6 +71,13 @@ impl ParseCallbacks for IntCallbacks {
             Some(IntKind::Int)
         } else {
             None
+        }
+    }
+    fn will_parse_macro(&self, name: &str) -> bindgen::callbacks::MacroParsingBehavior {
+        if self.0.contains(name) {
+            bindgen::callbacks::MacroParsingBehavior::Ignore
+        } else {
+            bindgen::callbacks::MacroParsingBehavior::Default
         }
     }
 }
@@ -900,6 +909,19 @@ fn main() {
         .iter()
         .map(|include| format!("-I{}", include.to_string_lossy()));
 
+    let ignored_macros = IntCallbacks(
+            vec![
+                "FP_INFINITE".into(),
+                "FP_NAN".into(),
+                "FP_NORMAL".into(),
+                "FP_SUBNORMAL".into(),
+                "FP_ZERO".into(),
+                "IPPORT_RESERVED".into(),
+            ]
+            .into_iter()
+            .collect(),
+    );
+
     // The bindgen::Builder is the main entry point
     // to bindgen, and lets you build up options for
     // the resulting bindings.
@@ -917,7 +939,7 @@ fn main() {
         .rustified_enum("*")
         .prepend_enum_name(false)
         .derive_eq(true)
-        .parse_callbacks(Box::new(IntCallbacks));
+        .parse_callbacks(Box::new(ignored_macros));
 
     // The input headers we would like to generate
     // bindings for.
