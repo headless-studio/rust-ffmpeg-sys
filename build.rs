@@ -939,7 +939,8 @@ fn main() {
         .rustified_enum("*")
         .prepend_enum_name(false)
         .derive_eq(true)
-        .parse_callbacks(Box::new(ignored_macros));
+        .parse_callbacks(Box::new(ignored_macros))
+        .rustfmt_bindings(true);
 
     // The input headers we would like to generate
     // bindings for.
@@ -1039,9 +1040,11 @@ fn main() {
     }
 
     // Finish the builder and generate the bindings.
-    let bindings = builder.generate()
+    let bindings = builder
+        .generate_comments(true)
+        .generate()
     // Unwrap the Result and panic on failure.
-    .expect("Unable to generate bindings");
+        .expect("Unable to generate bindings");
 
     // Write the bindings to the $OUT_DIR/bindings.rs file.
     bindings
